@@ -1,55 +1,75 @@
-import React, { useState, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import React, { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { Typography } from "@mui/material";
+import { Typography, CircularProgress, Box } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import Button from "@mui/material/Button";
 import TableContainer from "@mui/material/TableContainer";
 import Table from "@mui/material/Table";
 
-import { fetchAllCountriesAsMiddleWare } from "../redux/actions/allCountriesAction";
 import CountriesTableHeader from "../components/CountriesTableHeader";
 import CountriesTableBody from "../components/CountriesTableBody";
 import SearchBar from "../components/SearchBar";
-import { InititalState, AppDispatch } from "../redux/store/store";
 import { Country } from "../types";
+import { useInfiniteCountries, useAllCountries } from "../hooks/useInfiniteCountries";
 
 function Home() {
   const styles = useStyles();
-  const dispatch = useDispatch<AppDispatch>();
-  const allCountries = useSelector((state: InititalState) => state.countries.countriesData);
-  const error = useSelector((state: InititalState) => state.countries.error);
-  const loading = useSelector((state: InititalState) => state.countries.loading);
   const [search, setSearch] = useState<string>("");
 
-  //dispatch action to fetch all countries data
-  useEffect(() => {
-    //if (allCountries) return;
-    dispatch(fetchAllCountriesAsMiddleWare());
-  }, [dispatch]);
+  // Use TanStack Query for infinite loading
+  const {
+    data,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    isFetchingNextPage,
+    status,
+  } = useInfiniteCountries();
 
-  if (error) {
-    return <p>Something went wrong</p>;
+  // Fetch all countries for search functionality
+  const {
+    data: allCountriesData,
+    error: allCountriesError,
+  } = useAllCountries();
+
+  const filteredCountries = useMemo(() => {
+    if (search === "") {
+      // No search - show paginated results
+      return data?.pages.flatMap(page => page.countries) || [];
+    } else {
+      // Searching - filter through all countries
+      if (allCountriesData) {
+        return allCountriesData.filter((item: Country) => 
+          item.name.common.toLowerCase().includes(search.toLowerCase())
+        );
+      }
+      return [];
+    }
+  }, [data, allCountriesData, search]);
+
+  if (status === 'pending') {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+        <CircularProgress />
+        <Typography variant="h6" sx={{ ml: 2 }}>Loading countries...</Typography>
+      </Box>
+    );
   }
 
-  if (loading) {
-    return <p>Loading countries...</p>;
+  if (status === 'error' || allCountriesError) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+        <Typography variant="h6" color="error">
+          Something went wrong: {error?.message || allCountriesError?.message}
+        </Typography>
+      </Box>
+    );
   }
 
   const SearchHandler = (event: any) => {
     setSearch(event.target.value);
   };
-
-  //search country from search bar - ensure allCountries is always an array
-  const countriesArray = Array.isArray(allCountries) ? allCountries : [];
-  const filteredCountries = countriesArray.filter((item: Country) => {
-    if (search === "") {
-      return item;
-    } else if (item.name.common.toLowerCase().includes(search.toLowerCase())) {
-      return item;
-    }
-    return false; // Fix array-callback-return warning
-  });
 
   return (
     <div>
@@ -78,6 +98,63 @@ function Home() {
             />
           </Table>
         </TableContainer>
+        
+        {/* Load More Button - only show when not searching and there are more pages */}
+        {hasNextPage && search === "" && (
+          <Box display="flex" justifyContent="center" mt={4} mb={2}>
+            <Button 
+              variant="contained" 
+              onClick={() => fetchNextPage()}
+              disabled={isFetchingNextPage}
+              size="large"
+              color="primary"
+            >
+              {isFetchingNextPage ? (
+                <>
+                  <CircularProgress size={20} sx={{ mr: 1, color: 'white' }} />
+                  Loading More...
+                </>
+              ) : (
+                'Load More Countries'
+              )}
+            </Button>
+          </Box>
+        )}
+
+        {/* Loading indicator for background fetching */}
+        {isFetching && !isFetchingNextPage && (
+          <Box display="flex" justifyContent="center" mt={2}>
+            <CircularProgress size={24} />
+          </Box>
+        )}
+
+        {/* Show total count and current progress */}
+        <Box display="flex" justifyContent="center" mt={2} mb={4}>
+          <Typography variant="body2" color="text.secondary">
+            {search === "" ? (
+              // Not searching - show pagination info
+              <>
+                Showing {filteredCountries.length} countries
+                {data?.pages[0]?.totalCount && ` of ${data.pages[0].totalCount}`}
+              </>
+            ) : (
+              // Searching - show search results
+              <>
+                Found {filteredCountries.length} countries matching "{search}"
+                {allCountriesData && ` out of ${allCountriesData.length} total`}
+              </>
+            )}
+          </Typography>
+        </Box>
+
+        {/* No more countries message */}
+        {!hasNextPage && search === "" && data && (
+          <Box display="flex" justifyContent="center" mt={2} mb={4}>
+            <Typography variant="body2" color="text.secondary" fontStyle="italic">
+              All countries loaded!
+            </Typography>
+          </Box>
+        )}
       </div>
     </div>
   );

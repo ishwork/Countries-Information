@@ -13,11 +13,6 @@ export type InititalState = {
   favCountries: {
     favouriteCountries: string[]
   }
-  countries: {
-  countriesData: Country[]
-  error: string 
-  loading: boolean
-  }
   country: {
     countryData: Country[]
     loading: boolean
@@ -27,11 +22,6 @@ export type InititalState = {
 
 const initialState: InititalState = {
   favCountries: { favouriteCountries: [] },
-  countries: {
-    countriesData: [],
-    error: '',
-    loading: false,
-  },
   country: {
     countryData: [],
     loading: false,
