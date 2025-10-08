@@ -51,7 +51,7 @@ function CountriesTableBody({ filteredCountries}: TableBodyTypes) {
               </Typography>
             </TableCell>
             <TableCell align="center">
-              <Typography> {row?.population}</Typography>
+              <Typography> {row?.population?.toLocaleString()}</Typography>
             </TableCell>
             <TableCell align="center">
               <Typography> {row?.region}</Typography>
