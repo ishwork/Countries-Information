@@ -29,9 +29,8 @@ export const fetchAllCountriesAsMiddleWare = () => {
   return async (dispatch: Dispatch) => {
     try {
       dispatch(fetchAllCountriesStart());
-      const response = await fetch(`https://restcountries.com/v3.1/all`);
+      const response = await fetch(`https://restcountries.com/v3.1/all?fields=name,capital,population,region,flags,languages`);
       const data = await response.json();
-      //console.log("countries data:", data);
       dispatch(fetchAllCountriesSuccess(data));
     } catch (error) {
       dispatch(fetchAllCountriesError(`${error}`));

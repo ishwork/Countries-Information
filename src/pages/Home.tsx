@@ -19,6 +19,7 @@ function Home() {
   const dispatch = useDispatch();
   const allCountries = useSelector((state: InititalState) => state.countries.countriesData);
   const error = useSelector((state: InititalState) => state.countries.error);
+  const loading = useSelector((state: InititalState) => state.countries.loading);
   const [search, setSearch] = useState<string>("");
 
   //dispatch action to fetch all countries data
@@ -31,17 +32,23 @@ function Home() {
     return <p>Something went wrong</p>;
   }
 
+  if (loading) {
+    return <p>Loading countries...</p>;
+  }
+
   const SearchHandler = (event: any) => {
     setSearch(event.target.value);
   };
 
-  //search country from search bar
-  const filteredCountries = allCountries?.filter((item: Country) => {
+  //search country from search bar - ensure allCountries is always an array
+  const countriesArray = Array.isArray(allCountries) ? allCountries : [];
+  const filteredCountries = countriesArray.filter((item: Country) => {
     if (search === "") {
       return item;
     } else if (item.name.common.toLowerCase().includes(search.toLowerCase())) {
       return item;
     }
+    return false; // Fix array-callback-return warning
   });
 
   return (
