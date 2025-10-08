@@ -11,12 +11,12 @@ import { fetchAllCountriesAsMiddleWare } from "../redux/actions/allCountriesActi
 import CountriesTableHeader from "../components/CountriesTableHeader";
 import CountriesTableBody from "../components/CountriesTableBody";
 import SearchBar from "../components/SearchBar";
-import { InititalState } from "../redux/store/store";
+import { InititalState, AppDispatch } from "../redux/store/store";
 import { Country } from "../types";
 
 function Home() {
   const styles = useStyles();
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const allCountries = useSelector((state: InititalState) => state.countries.countriesData);
   const error = useSelector((state: InititalState) => state.countries.error);
   const loading = useSelector((state: InititalState) => state.countries.loading);
@@ -74,7 +74,7 @@ function Home() {
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
             <CountriesTableHeader />
             <CountriesTableBody
-            filteredCountries={filteredCountries}
+              filteredCountries={filteredCountries}
             />
           </Table>
         </TableContainer>

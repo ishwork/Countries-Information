@@ -13,10 +13,10 @@ import AccordionDetails from "@mui/material/AccordionDetails";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 import { fetchCountryAsMiddleWare } from "../redux/actions/countryAction";
-import { InititalState } from "../redux/store/store";
+import { InititalState, AppDispatch } from "../redux/store/store";
 
 function Country() {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const { countryName } = useParams();
 

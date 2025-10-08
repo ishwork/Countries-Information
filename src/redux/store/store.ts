@@ -1,5 +1,7 @@
 import { createStore, applyMiddleware } from "redux";
-import thunk from "redux-thunk";
+import thunk, { ThunkDispatch } from "redux-thunk";
+import { AnyAction } from "redux";
+
 import { Country } from "../../types";
 
 //for integrating with Chrome's devtool extension to see the Redux states
@@ -58,6 +60,8 @@ const storeHouse = () => {
 
   return store;
 };
+
+export type AppDispatch = ThunkDispatch<InititalState, void, AnyAction>;
 export default storeHouse;
 
 
