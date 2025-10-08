@@ -10,6 +10,7 @@ function SearchBar(props: searchBarPropsType) {
     <>
       <div style={{ width: "50rem" }}>
         <input
+          data-testid="search-input"
           type="search"
           placeholder="Search"
           aria-label="Search"
