@@ -25,18 +25,23 @@ const fetchCountries = async ({ pageParam = 0 }): Promise<{
 }> => {
   const allCountries = await fetchAllCountries();
   
+  // Sort countries alphabetically by common name before pagination
+  const sortedCountries = allCountries.sort((a, b) => 
+    a.name.common.localeCompare(b.name.common)
+  );
+  
   // Calculate pagination
   const startIndex = pageParam * COUNTRIES_PER_PAGE;
   const endIndex = startIndex + COUNTRIES_PER_PAGE;
-  const countries = allCountries.slice(startIndex, endIndex);
+  const countries = sortedCountries.slice(startIndex, endIndex);
   
   // Determine if there's a next page
-  const nextPage = endIndex < allCountries.length ? pageParam + 1 : undefined;
+  const nextPage = endIndex < sortedCountries.length ? pageParam + 1 : undefined;
   
   return {
     countries,
     nextPage,
-    totalCount: allCountries.length,
+    totalCount: sortedCountries.length,
   };
 };
 
@@ -50,11 +55,20 @@ export const useInfiniteCountries = () => {
   });
 };
 
+// Fetch all countries sorted for search functionality
+const fetchAllCountriesSorted = async (): Promise<Country[]> => {
+  const countries = await fetchAllCountries();
+  // Sort countries alphabetically by common name
+  return countries.sort((a, b) => 
+    a.name.common.localeCompare(b.name.common)
+  );
+};
+
 // Hook to get all countries for search functionality
 export const useAllCountries = () => {
   return useQuery({
     queryKey: ['allCountries'],
-    queryFn: fetchAllCountries,
+    queryFn: fetchAllCountriesSorted,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
