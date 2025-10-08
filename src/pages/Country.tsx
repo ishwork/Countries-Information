@@ -25,7 +25,7 @@ function Country() {
 
   useEffect(() => {
     dispatch(fetchCountryAsMiddleWare(countryName || null));
-  }, [dispatch]);
+  }, [dispatch, countryName]);
 
   if (error) {
     return <p>Something went wrong</p>;

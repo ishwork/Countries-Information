@@ -1,11 +1,9 @@
 import { Country } from "../../types";
 import { Dispatch } from "redux";
-import {InititalState} from "../store/store"
+
 export const FETCH_COUNTRY_START = "FETCH_COUNTRY_START";
 export const FETCH_COUNTRY_SUCCESS = "FETCH_COUNTRY_SUCCESS";
 export const FETCH_COUNTRY_ERROR = "FETCH_COUNTRY_ERROR";
-
-//type GetState = () => InititalState;
 
 export function fetchCountryStart(): CountryStartAction {
   return {

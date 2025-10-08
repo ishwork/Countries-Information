@@ -1,5 +1,7 @@
-import {Country} from "../../types"
 import { Dispatch } from "redux";
+
+import {Country} from "../../types"
+
 export const FETCH_ALL_COUNTRIES_START = "FETCH_ALL_COUNTRIES_START";
 export const FETCH_ALL_COUNTRIES_SUCCESS = "FETCH_ALL_COUNTRIES_SUCCESS";
 export const FETCH_ALL_COUNTRIES_ERROR = "FETCH_ALL_COUNTRIES_ERROR";
